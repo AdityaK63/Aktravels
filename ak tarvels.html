@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aditya Tours&Travels</title>
+  <style>
+    * { box-sizing: border-box; }
+    body, html {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #000;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    .section { display: none; padding: 40px; text-align: center; }
+    .show { display: block; }
+    .intro { height: 100vh; background: linear-gradient(#000, #111); position: relative; }
+    .streetlight {
+      position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+      width: 20px; height: 100px; background: yellow;
+      animation: glow 3s infinite alternate;
+    }
+    @keyframes glow { from { opacity: 0.3; } to { opacity: 1; } }
+    .car {
+      position: absolute; bottom: 20%; left: -200px; width: 150px;
+      transition: left 2s ease-in-out;
+    }
+    .ak-logo {
+      opacity: 0; font-size: 3em; color: #00e6e6;
+      animation: fadeIn 3s ease forwards; animation-delay: 3s;
+      margin-top: 200px;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+    input, select, button {
+      margin: 10px; padding: 10px; font-size: 1em; border-radius: 8px; border: none;
+    }
+    button {
+      background: #00e6e6; color: #000; cursor: pointer;
+    }
+    .car-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .car-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #00cccc;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .car-card img {
+      width: 100%; height: 150px; object-fit: cover; border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- INTRO SECTION -->
+<div class="intro section show" id="intro">
+  <div class="streetlight"></div>
+  <img src="logo.jpg" class="car" id="car" />
+  <div class="ak-logo">Aditya Tours&Travels</div>
+</div>
+
+<!-- CUSTOMER INFO SECTION -->
+<div class="section" id="formSection">
+  <h2>Welcome to AK Travels</h2>
+  <p>Please enter your details to get started:</p>
+  <input type="text" id="name" placeholder="Your Name" required /><br/>
+  <input type="number" id="age" placeholder="Your Age" required min="18" /><br/>
+  <input type="text" id="city" placeholder="Your City" required /><br/>
+  <label for="category">Select Car Category:</label>
+  <select id="category">
+    <option value="Hatchback">Hatchback</option>
+    <option value="Sedan">Sedan</option>
+    <option value="MPV">MPV</option>
+    <option value="SUV">SUV</option>
+  </select><br/>
+  <button onclick="goToCategoryCars()">Next</button>
+</div>
+
+<!-- SHOW CARS BASED ON CATEGORY -->
+<div class="section" id="categoryCarsSection">
+  <h2>Select Your Car</h2>
+  <div class="car-grid" id="carGrid"></div>
+  <button onclick="goToBooking()">Proceed to Booking</button>
+</div>
+
+<!-- BOOKING SECTION -->
+<div class="section" id="bookingSection">
+  <h2>Booking for: <span id="selectedCarName"></span></h2>
+  <p>Rate: ₹<span id="carRate"></span>/km (+₹5/km A/C)</p>
+  <input type="number" id="days" placeholder="Number of Days" min="1" required /><br/>
+  <label><input type="checkbox" id="acOption" /> Include A/C</label><br/>
+  <button onclick="goToPayment()">Next: Payment</button>
+</div>
+
+<!-- PAYMENT SECTION -->
+<div class="section" id="paymentSection">
+  <h2>Payment</h2>
+  <p>Total Fare: ₹<span id="totalFare"></span></p>
+  <p>Scan the QR to pay via UPI:</p>
+  <img src="https://api.qrserver.com/v1/create-qr-code/?data=upi://pay&size=150x150" alt="QR Code" /><br/>
+  <button onclick="goToThankYou()">Complete Payment</button>
+</div>
+
+<!-- THANK YOU SECTION -->
+<div class="section" id="thankYouSection">
+  <h2>Thank You for Booking!</h2>
+  <p>You selected: <span id="finalCar"></span></p>
+  <p>Pickup location: AK travels vidya nagar near bvb college hubli 580023</p>
+</div>
+
+<script>
+  const carData = {
+    Hatchback: [
+      { name: 'Celerio', rate: 8, img: 'celerio.jpg' },
+      { name: 'Alto', rate: 8, img: 'alto.jpg' },
+      { name: 'i10', rate: 8, img: 'i10.jpg' },
+      { name: 'Tiago', rate: 8, img: 'taigo.jpg' },
+      { name: 'Santro', rate: 8, img: 'santro.jpg' },
+      { name: 'WagonR', rate: 8, img: 'wagonr.jpg' }
+    ],
+    Sedan: [
+      { name: 'Dzire', rate: 10, img: 'dzire.jpg' },
+      { name: 'City', rate: 10, img: 'city.jpg' },
+      { name: 'Verna', rate: 10, img: 'verna.jpg' },
+      { name: 'Ciaz', rate: 10, img: 'ciaz.jpg' },
+      { name: 'Amaze', rate: 10, img: 'amaze.jpg' },
+      { name: 'Slavia', rate: 10, img: 'slavia.jpg' }
+    ],
+    MPV: [
+      { name: 'Ertiga', rate: 12, img: 'ertiga.jpg' },
+      { name: 'Marazzo', rate: 12, img: 'marazo.jpg' },
+      { name: 'XL6', rate: 12, img: 'xl6.jpg' },
+      { name: 'Triber', rate: 12, img: 'triber.jpg' },
+      { name: 'Innova', rate: 12, img: 'innova.jpg' },
+      { name: 'Carnival', rate: 12, img: 'carnival.jpg' }
+    ],
+    SUV: [
+      { name: 'Scorpio', rate: 15, img: 'scorpio.jpg' },
+      { name: 'Creta', rate: 15, img: 'crets.jpg' },
+      { name: 'Hector', rate: 15, img: 'hector.jpg' },
+      { name: 'Seltos', rate: 15, img: 'seltos.jpg' },
+      { name: 'XUV700', rate: 15, img: 'xuv700.jpg' },
+      { name: 'Safari', rate: 15, img: 'tata1.jpg' }
+    ]
+  };
+
+  let selectedCar = null, selectedRate = 0;
+
+  window.onload = () => {
+    setTimeout(() => { document.getElementById("car").style.left = "50%"; }, 1000);
+    setTimeout(() => {
+      document.getElementById("intro").classList.remove("show");
+      document.getElementById("formSection").classList.add("show");
+    }, 5000);
+  };
+
+  function goToCategoryCars() {
+    const age = document.getElementById("age").value;
+    if (age < 18) return alert("Age must be 18 or above");
+
+    const category = document.getElementById("category").value;
+    const grid = document.getElementById("carGrid");
+    grid.innerHTML = "";
+    carData[category].forEach(car => {
+      grid.innerHTML += `
+        <div class="car-card" onclick="chooseCar('${car.name}', ${car.rate}, '${car.img}')">
+          <img src="${car.img}" alt="${car.name}" />
+          <h3>${car.name}</h3>
+          <p>₹${car.rate}/km + ₹5/km A/C</p>
+        </div>`;
+    });
+    document.getElementById("formSection").classList.remove("show");
+    document.getElementById("categoryCarsSection").classList.add("show");
+  }
+
+  function chooseCar(name, rate, img) {
+    selectedCar = name;
+    selectedRate = rate;
+    document.querySelectorAll(".car-card").forEach(c => c.style.borderColor = "#00cccc");
+    event.currentTarget.style.borderColor = "yellow";
+  }
+
+  function goToBooking() {
+    if (!selectedCar) return alert("Please select a car.");
+    document.getElementById("categoryCarsSection").classList.remove("show");
+    document.getElementById("bookingSection").classList.add("show");
+    document.getElementById("selectedCarName").innerText = selectedCar;
+    document.getElementById("carRate").innerText = selectedRate;
+  }
+
+  function goToPayment() {
+    const days = parseInt(document.getElementById("days").value);
+    if (!days || days < 1) return alert("Please enter valid number of days.");
+    const ac = document.getElementById("acOption").checked;
+    const total = days * 300 * (selectedRate + (ac ? 5 : 0));
+    document.getElementById("bookingSection").classList.remove("show");
+    document.getElementById("paymentSection").classList.add("show");
+    document.getElementById("totalFare").innerText = total;
+  }
+
+  function goToThankYou() {
+    document.getElementById("paymentSection").classList.remove("show");
+    document.getElementById("thankYouSection").classList.add("show");
+    document.getElementById("finalCar").innerText = selectedCar;
+  }
+</script>
+
+</body>
+</html>
